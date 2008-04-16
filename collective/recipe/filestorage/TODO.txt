@@ -1,0 +1,16 @@
+by initial release:
+[X] test regeneration of conf files after filestorage part config change
+[X] test .fs files not removed on uninstall
+[X] test all error conditions
+    [X] incorrect part ordering
+    [X] no zope found
+    [X] multiple ZEOs found
+    [X] invalid zope or zeo parts specified
+[X] test inheritance of variables
+    [X] devise way to inherit a pattern for naming the filestorages
+[X] test manually overriding zope and zeo parts
+[X] document all options
+
+nice to have later:
+[ ] relstorage support
+[ ] blob support
