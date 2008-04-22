@@ -1,5 +1,8 @@
-0.1 (xxxx-xx-xx)
-==================
+0.1 (2008-04-22)
+================
+
+ - Happy Earth Day!
+   [davisagli]
 
  - Created recipe with ZopeSkel.  Initial implementation.
    [davisagli]
