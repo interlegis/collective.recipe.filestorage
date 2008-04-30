@@ -120,9 +120,13 @@ class Recipe(object):
         zodb_cache_size = self._subpart_option(subpart, 'zodb-cache-size', default='5000', inherit=zope_part)
         zodb_name = self._subpart_option(subpart, 'zodb-name', default='%(fs_part_name)s')
         zodb_mountpoint = self._subpart_option(subpart, 'zodb-mountpoint', default='/%(fs_part_name)s')
+        zodb_container_class = self._subpart_option(subpart, 'zodb-container-class', default='')
+        if zodb_container_class:
+            zodb_container_class = "\ncontainer-class %s" % zodb_container_class
         zodb_stanza = zodb_template % dict(
             zodb_name = zodb_name,
             zodb_mountpoint = zodb_mountpoint,
+            zodb_container_class = zodb_container_class,
             zodb_cache_size = zodb_cache_size,
             storage_snippet = storage_snippet.strip()
             )
@@ -188,6 +192,6 @@ zodb_template="""
 <zodb_db %(zodb_name)s>
     cache-size %(zodb_cache_size)s
     %(storage_snippet)s
-    mount-point %(zodb_mountpoint)s
+    mount-point %(zodb_mountpoint)s%(zodb_container_class)s
 </zodb_db>
 """

@@ -1,3 +1,9 @@
+0.2 (2008-04-30)
+================
+
+ - Added zodb_container_class option.
+   [davisagli]
+
 0.1 (2008-04-22)
 ================
 

@@ -35,6 +35,8 @@ zodb-cache-size
     associated zope part.  Defaults to 5000.
 zodb-mountpoint
     Set the path to the mountpoint.  Defaults to '/%(fs_part_name)s'.
+zodb-container-class
+    Set the class of the object being mounted.  Defaults to not being set.
 zeo-address
     Set the port of the associated ZEO server.  Inherits from the associated Zope and ZEO parts.  Defaults to 8100.
 zeo-client-cache-size
@@ -143,6 +145,7 @@ We can override the defaults for a number of settings::
     ... zodb-name = %(fs_part_name)s_db
     ... zodb-cache-size = 1000
     ... zodb-mountpoint = /%(fs_part_name)s_mountpoint
+    ... zodb-container-class = Products.ATContentTypes.content.folder.ATFolder
     ... parts =
     ...     my-fs
     ... '''.replace('%(zope2_location)s', zope2_location))
@@ -158,6 +161,7 @@ We can override the defaults for a number of settings::
           path .../var/filestorage/my-fs/Data.fs
         </filestorage>
         mount-point /my-fs_mountpoint
+        container-class Products.ATContentTypes.content.folder.ATFolder
     </zodb_db>
     <BLANKLINE>
     
