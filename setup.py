@@ -27,9 +27,6 @@ long_description = (
     '************\n'
     + '\n' +
     read('CONTRIBUTORS.txt')
-    + '\n' +
-    'Download\n'
-    '********\n'
     )
 entry_point = 'collective.recipe.filestorage:Recipe'
 entry_points = {"zc.buildout": ["default = %s" % entry_point]}
