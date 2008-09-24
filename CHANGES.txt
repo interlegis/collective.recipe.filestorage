@@ -1,3 +1,9 @@
+0.3 (unreleased)
+================
+
+ - Fixed restructured text of long description (README.txt).
+   [maurits]
+
 0.2 (2008-04-30)
 ================
 

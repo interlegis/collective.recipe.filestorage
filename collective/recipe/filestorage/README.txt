@@ -98,7 +98,7 @@ The recipe will also create a directory for the new filestorage::
     True
     
 Let's make sure that the conf files will be regenerated whenever we make a change to a filestorage part,
-even if the direct configuration for the zope/zeo parts hasn't changed.
+even if the direct configuration for the zope/zeo parts hasn't changed::
 
     >>> open('buildout.cfg', 'a').write("    my-fs-2\n")
     >>> print system(join('bin', 'buildout') + ' -q')
@@ -166,7 +166,7 @@ We can override the defaults for a number of settings::
     <BLANKLINE>
     
 A setting can also be modified just for one particular filestorage, by creating a new part with
-the 'filestorage_' prefix, like so::
+the ``filestorage_`` prefix, like so::
 
     >>> write('buildout.cfg',
     ... '''
@@ -206,7 +206,7 @@ the 'filestorage_' prefix, like so::
 
 
 By default, the recipe adds the extra filestorages to each plone.recipe.zope2instance part in the buildout,
-but you can tell it to only add it to certain parts:
+but you can tell it to only add it to certain parts::
 
     >>> write('buildout.cfg',
     ... '''
