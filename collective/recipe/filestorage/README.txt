@@ -80,7 +80,7 @@ Our zope.conf should get the extra filestorage stanza automatically injected int
 
    >>> instance = os.path.join(sample_buildout, 'parts', 'instance')
    >>> print open(os.path.join(instance, 'etc', 'zope.conf')).read()
-   instancehome ...instance
+   %define INSTANCEHOME...instance
    ...
    <BLANKLINE>
    <zodb_db my-fs>
@@ -152,7 +152,7 @@ We can override the defaults for a number of settings::
     >>> print system(join('bin', 'buildout') + ' -q')
     >>> instance = os.path.join(sample_buildout, 'parts', 'instance')
     >>> print open(os.path.join(instance, 'etc', 'zope.conf')).read()
-    instancehome ...instance
+    %define INSTANCEHOME...instance
     ...
     <BLANKLINE>
     <zodb_db my-fs_db>
@@ -192,7 +192,7 @@ the ``filestorage_`` prefix, like so::
     >>> print system(join('bin', 'buildout') + ' -q')
     >>> instance = os.path.join(sample_buildout, 'parts', 'instance')
     >>> print open(os.path.join(instance, 'etc', 'zope.conf')).read()
-    instancehome ...instance
+    %define INSTANCEHOME...instance
     ...
     <BLANKLINE>
     <zodb_db my-fs>
@@ -291,7 +291,7 @@ This should result in the appropriate additions to zeo.conf and both zope.conf's
     
     >>> primary = os.path.join(sample_buildout, 'parts', 'primary')
     >>> print open(os.path.join(primary, 'etc', 'zope.conf')).read()
-    instancehome /sample-buildout/parts/primary
+    %define INSTANCEHOME /sample-buildout/parts/primary
     ...
     <BLANKLINE>
     <zodb_db my-fs>
@@ -310,7 +310,7 @@ This should result in the appropriate additions to zeo.conf and both zope.conf's
 
     >>> secondary = os.path.join(sample_buildout, 'parts', 'secondary')
     >>> print open(os.path.join(secondary, 'etc', 'zope.conf')).read()
-    instancehome /sample-buildout/parts/secondary
+    %define INSTANCEHOME /sample-buildout/parts/secondary
     ...
     <BLANKLINE>
     <zodb_db my-fs>
@@ -380,7 +380,7 @@ As above, we can override a number of the default parameters::
     <BLANKLINE>
     >>> primary = os.path.join(sample_buildout, 'parts', 'primary')
     >>> print open(os.path.join(primary, 'etc', 'zope.conf')).read()
-    instancehome /sample-buildout/parts/primary
+    %define INSTANCEHOME /sample-buildout/parts/primary
     ...
     <BLANKLINE>
     <zodb_db my-fs_db>
@@ -398,7 +398,7 @@ As above, we can override a number of the default parameters::
     <BLANKLINE>
     >>> secondary = os.path.join(sample_buildout, 'parts', 'secondary')
     >>> print open(os.path.join(secondary, 'etc', 'zope.conf')).read()
-    instancehome /sample-buildout/parts/secondary
+    %define INSTANCEHOME /sample-buildout/parts/secondary
     ...
     <BLANKLINE>
     <zodb_db my-fs_db>
@@ -415,9 +415,11 @@ As above, we can override a number of the default parameters::
     </zodb_db>
     <BLANKLINE>
 
-By default, the recipe adds the extra filestorages to the first plone.recipe.zope2zeoserver part in the buildout,
-and will throw an error if there is more than one part using this recipe.  However, you can override this behavior
-by specifying a particular ZEO part.  In this case, the filestorages will only be added to the Zopes using that ZEO, by default::
+By default, the recipe adds the extra filestorages to the first
+plone.recipe.zope2zeoserver part in the buildout, and will throw an error if
+there is more than one part using this recipe.  However, you can override this
+behavior by specifying a particular ZEO part.  In this case, the filestorages
+will only be added to the Zopes using that ZEO, by default::
 
     >>> write('buildout.cfg',
     ... '''
@@ -481,9 +483,10 @@ by specifying a particular ZEO part.  In this case, the filestorages will only b
 Error conditions
 ================
     
-Important note: You must place all parts using the collective.recipe.filestorage recipe before
-the part for the instances and zeoservers that you are adding the filestorage to.  Otherwise you'll
-get an error::
+Important note: You must place all parts using the
+collective.recipe.filestorage recipe before the part for the instances and
+zeoservers that you are adding the filestorage to.  Otherwise you'll get an
+error::
 
     >>> write('buildout.cfg',
     ... '''
@@ -529,8 +532,8 @@ A buildout with the filestorage recipe must include at least one part using the 
     Error: [collective.recipe.filestorage] "filestorage" part requires at least one plone.recipe.zope2instance part.
 
 
-Buildouts with multiple plone.recipe.zope2zeoserver parts will result in an error if the desired ZEO to associate
-with is not explicitly specified::
+Buildouts with multiple plone.recipe.zope2zeoserver parts will result in an
+error if the desired ZEO to associate with is not explicitly specified::
 
     >>> write('buildout.cfg',
     ... '''
@@ -636,6 +639,36 @@ So should specifying a nonexistent zope part::
     While:
     ...
     Error: [collective.recipe.filestorage] The "filestorage" part expected but failed to find the following parts in ${buildout:parts}: foobar
+
+If the Zope/ZEO parts are being automatically identified, let's make sure
+that we don't accidentally "wake up" parts that would not otherwise be
+included in the buildout::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... index = http://pypi.python.org/simple
+    ... parts =
+    ...     filestorage
+    ...     instance
+    ...
+    ... [instance]
+    ... recipe = plone.recipe.zope2instance
+    ... zope2-location = %(zope2_location)s
+    ... user = me
+    ...
+    ... [filestorage]
+    ... recipe = collective.recipe.filestorage
+    ... parts =
+    ...     my-fs
+    ...
+    ... [foobar]
+    ... recipe = plone.recipe.distros
+    ... urls =
+    ... ''' % globals())
+    >>> print system(join('bin', 'buildout') + ' -q')
+    >>> 'foobar' in os.listdir(os.path.join(sample_buildout, 'parts'))
+    False
 
 
 Running the tests
