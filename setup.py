@@ -8,20 +8,18 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '0.3dev'
+version = '0.3'
 
 long_description = (
-    read('README.txt')
+    'Detailed Documentation\n'
+    '**********************\n'
+    + '\n' +
+    read('collective', 'recipe', 'filestorage', 'README.txt')
     + '\n' +
     'Change history\n'
     '**************\n'
     + '\n' + 
     read('CHANGES.txt')
-    + '\n' +
-    'Detailed Documentation\n'
-    '**********************\n'
-    + '\n' +
-    read('collective', 'recipe', 'filestorage', 'README.txt')
     + '\n' +
     'Contributors\n' 
     '************\n'
@@ -41,7 +39,6 @@ setup(name='collective.recipe.filestorage',
       classifiers=[
         'Framework :: Buildout',
         'Framework :: Zope2',
-        'Framework :: Plone',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'Topic :: Software Development :: Libraries :: Python Modules',
@@ -50,7 +47,7 @@ setup(name='collective.recipe.filestorage',
       keywords='buildout zope zeo zodb mountpoint filestorage',
       author='David Glick',
       author_email='davidglick@onenw.org',
-      url='',
+      url='http://svn.plone.org/svn/collective/buildout/collective.recipe.filestorage/trunk',
       license='ZPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['collective', 'collective.recipe'],
