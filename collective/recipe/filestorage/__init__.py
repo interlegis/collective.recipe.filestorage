@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Recipe filestorage"""
 
-import os, sys
+import os
 
 from zc.buildout import UserError
 
@@ -10,6 +10,7 @@ class Recipe(object):
 
     def __init__(self, buildout, name, options):
         self.buildout, self.name, self.options = buildout, name, options
+        active_parts = [p.strip() for p in self.buildout['buildout']['parts'].split()]
         
         # figure out which ZEO we're going to inject filestorage configuration into, if any
         zeo_address = None
@@ -20,7 +21,8 @@ class Recipe(object):
             else:
                 raise UserError, '[collective.recipe.filestorage] "%s" part specifies nonexistant zeo part "%s".' % (name, self.zeo_part)
         else:
-            for part_name, part in self.buildout.items():
+            for part_name in active_parts:
+                part = self.buildout[part_name]
                 if not part.has_key('recipe'):
                     continue
                 elif part['recipe'] == 'plone.recipe.zope2zeoserver':
@@ -32,7 +34,8 @@ class Recipe(object):
         # figure out which Zopes we're going to inject filestorage configuration into
         self.zope_parts = options.get('zopes', '').split()
         if len(self.zope_parts) == 0:
-            for part_name, part in self.buildout.items():
+            for part_name in active_parts:
+                part = self.buildout[part_name]
                 if not part.has_key('recipe'):
                     continue
                 elif part['recipe'] == 'plone.recipe.zope2instance':

@@ -1,5 +1,9 @@
-0.3 (unreleased)
+0.3 (2009-03-19)
 ================
+
+ - Avoid causing the installation of all parts, even those not listed in the
+   [buildout] parts variable.  Thanks to Dylan Jay for the diagnosis and fix.
+   [davisagli]
 
  - Fixed restructured text of long description (README.txt).
    [maurits]

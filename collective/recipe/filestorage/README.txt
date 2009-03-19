@@ -431,6 +431,7 @@ will only be added to the Zopes using that ZEO, by default::
     ...     zeoserver2
     ...     primary
     ...     secondary
+    ...     other-zope
     ...
     ... [zeoserver1]
     ... recipe = plone.recipe.zope2zeoserver
