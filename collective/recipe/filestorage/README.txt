@@ -671,6 +671,41 @@ included in the buildout::
     >>> 'foobar' in os.listdir(os.path.join(sample_buildout, 'parts'))
     False
 
+Make sure that instance parts are found correctly in buildouts using 'extends'
+and the += or -= options::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... index = http://pypi.python.org/simple
+    ... parts =
+    ...     filestorage
+    ...     instance
+    ...
+    ... [instance]
+    ... recipe = plone.recipe.zope2instance
+    ... zope2-location = %(zope2_location)s
+    ... user = me
+    ...
+    ... [filestorage]
+    ... recipe = collective.recipe.filestorage
+    ... parts =
+    ...     extendstest
+    ... ''' % globals())
+    >>> write('prod.cfg',
+    ... '''
+    ... [buildout]
+    ... extends = buildout.cfg
+    ... parts +=
+    ...     foobar
+    ...
+    ... [foobar]
+    ... recipe = plone.recipe.distros
+    ... urls =
+    ... ''' % globals())
+    >>> print system(join('bin', 'buildout') + ' -q -c prod.cfg')
+    >>> 'extendstest' in open(os.path.join(instance, 'etc', 'zope.conf')).read()
+    True
 
 Running the tests
 =================
