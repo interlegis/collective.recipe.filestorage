@@ -85,9 +85,9 @@ class Recipe(object):
                 injector_parts.remove(part_name)
                 continue
             if part_name in target_parts:
-                target_parts.remove(part_name)
                 if len(injector_parts) > 0:
-                    raise UserError, '[collective.recipe.filestorage] The "%s" part must be listed before the following parts in ${buildout:parts}: %s' % (self.name, ', '.join(self.zope_parts))
+                    raise UserError, '[collective.recipe.filestorage] The "%s" part must be listed before the following parts in ${buildout:parts}: %s' % (self.name, ', '.join(target_parts))
+                target_parts.remove(part_name)
         if len(target_parts) > 0:
             raise UserError, '[collective.recipe.filestorage] The "%s" part expected but failed to find the following parts in ${buildout:parts}: %s' % (self.name, ', '.join(target_parts))
         

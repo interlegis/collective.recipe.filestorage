@@ -1,7 +1,10 @@
 0.4 (unreleased)
 ================
 
-
+ - Fixed message indicating which parts the filestorage part must be installed
+   before.  This fixes https://bugs.launchpad.net/bugs/433877 (Thanks, Jean
+   Jordaan)
+   [davisagli]
 
 0.3 (2009-03-19)
 ================
