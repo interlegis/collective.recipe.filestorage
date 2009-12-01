@@ -1,6 +1,10 @@
 0.4 (unreleased)
 ================
 
+ - Add support for creating blob storages associated with the created
+   filestorage parts.
+   [davisagli]
+
  - Fixed message indicating which parts the filestorage part must be installed
    before.  This fixes https://bugs.launchpad.net/bugs/433877 (Thanks, Jean
    Jordaan)

@@ -64,6 +64,22 @@ class Recipe(object):
             fs_dir = os.path.dirname(location)
             if not os.path.exists(fs_dir):
                 os.makedirs(fs_dir)
+            
+            # create blobstorage dirs
+            blob_storage = os.path.join('var', '%(fs_part_name)s')
+            if self._subpart_option(subpart, 'blob-storage', default=''):
+                blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
+                if not blob_storage.startswith(os.path.sep):
+                    blob_storage = os.path.join(self.buildout['buildout']['directory'], blob_storage)
+                if not os.path.exists(blob_storage):
+                    os.makedirs(blob_storage)
+            
+                if self.zeo_part:
+                    zeo_blob_storage = self._subpart_option(subpart, 'zeo-blob-storage', default=blob_storage)
+                    if not zeo_blob_storage.startswith(os.path.sep):
+                        zeo_blob_storage = os.path.join(self.buildout['buildout']['directory'], zeo_blob_storage)
+                    if not os.path.exists(zeo_blob_storage):
+                        os.makedirs(zeo_blob_storage)
 
         # return an empty list because we don't have anything we want buildout to automatically remove
         return tuple()
@@ -96,9 +112,20 @@ class Recipe(object):
         
         location = self._subpart_option(subpart, 'location', default=os.path.join('var', 'filestorage', '%(fs_part_name)s', '%(fs_part_name)s.fs'))
         location = os.path.join(self.buildout['buildout']['directory'], location)
-        storage_snippet = file_storage_template % dict(
+        
+        storage_template = file_storage_template
+        blob_storage = os.path.join('var', '%(fs_part_name)s')
+        blob_enabled = False
+        if self._subpart_option(subpart, 'blob-storage', default=''):
+            blob_enabled = True
+            blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
+            if not blob_storage.startswith(os.path.sep):
+                blob_storage = os.path.join(self.buildout['buildout']['directory'], blob_storage)
+            storage_template = blob_storage_template
+        storage_snippet = storage_template % dict(
             fs_name = '',
-            fs_path = location
+            fs_path = location,
+            blob_storage = blob_storage,
             )
         
         if self.zeo_part and zope_options.get('zeo-client', 'false').lower() in ('yes', 'true', 'on', '1'):
@@ -111,6 +138,14 @@ class Recipe(object):
             zeo_client_name = self._subpart_option(subpart, 'zeo-client-name', default='%(fs_part_name)s_zeostorage')
             zeo_client_var = self._subpart_option(subpart, 'zeo-client-var', default=os.path.join(zope_options['location'], 'var'))
             
+            zeo_storage_template = zeo_file_storage_template
+            zeo_blob_storage = self._subpart_option(subpart, 'zeo-blob-storage', default=blob_storage)
+            if not zeo_blob_storage.startswith(os.path.sep):
+                zeo_blob_storage = os.path.join(self.buildout['buildout']['directory'], zeo_blob_storage)
+            zeo_shared_blob_dir = self._subpart_option(subpart, 'zeo-shared-blob-dir', default='on')
+            if blob_enabled:
+                storage_template = zeo_blob_storage_template
+            
             storage_snippet = zeo_storage_template % dict(
                 zeo_address = zeo_address,
                 zeo_client_cache_size = zeo_client_cache_size,
@@ -118,6 +153,8 @@ class Recipe(object):
                 zeo_storage = zeo_storage,
                 zeo_client_name = zeo_client_name,
                 zeo_client_var=zeo_client_var,
+                zeo_blob_storage = zeo_blob_storage,
+                zeo_shared_blob_dir = zeo_shared_blob_dir,
                 )
         
         zodb_cache_size = self._subpart_option(subpart, 'zodb-cache-size', default='5000', inherit=zope_part)
@@ -125,7 +162,7 @@ class Recipe(object):
         zodb_mountpoint = self._subpart_option(subpart, 'zodb-mountpoint', default='/%(fs_part_name)s')
         zodb_container_class = self._subpart_option(subpart, 'zodb-container-class', default='')
         if zodb_container_class:
-            zodb_container_class = "\ncontainer-class %s" % zodb_container_class
+            zodb_container_class = "\n    container-class %s" % zodb_container_class
         zodb_stanza = zodb_template % dict(
             zodb_name = zodb_name,
             zodb_mountpoint = zodb_mountpoint,
@@ -143,9 +180,19 @@ class Recipe(object):
         location = self._subpart_option(subpart, 'location', default=os.path.join('var', 'filestorage', '%(fs_part_name)s', '%(fs_part_name)s.fs'))
         location = os.path.join(self.buildout['buildout']['directory'], location)
         zeo_storage = self._subpart_option(subpart, 'zeo-storage', default='%(fs_part_name)s')
-        storage_snippet = file_storage_template % dict(
+        
+        storage_template = file_storage_template
+        blob_storage = os.path.join('var', '%(fs_part_name)s')
+        if self._subpart_option(subpart, 'blob-storage', default=''):
+            blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
+            if not blob_storage.startswith(os.path.sep):
+                blob_storage = os.path.join(self.buildout['buildout']['directory'], blob_storage)
+            storage_template = blob_storage_template
+        
+        storage_snippet = storage_template % dict(
             fs_name=zeo_storage,
-            fs_path=location
+            fs_path=location,
+            blob_storage=blob_storage,
             )
 
         zeo_conf_additional = zeo_options.get('zeo-conf-additional', '')
@@ -180,12 +227,39 @@ file_storage_template="""
     </filestorage>
 """
 
-zeo_storage_template="""
+# we use a blobstorage wrapper AND a blob-dir within the filestorage
+# stanza for compatibility with both ZODB 3.8.x and 3.9.x
+blob_storage_template="""
+    # Blob-enabled FileStorage database
+    <blobstorage>
+      blob-dir %(blob_storage)s
+      <filestorage %(fs_name)s>
+        path %(fs_path)s
+        blob-dir %(blob_storage)s
+      </filestorage>
+    </blobstorage>
+"""
+
+zeo_file_storage_template="""
     <zeoclient>
       server %(zeo_address)s
       storage %(zeo_storage)s
       name %(zeo_client_name)s
       var %(zeo_client_var)s
+      cache-size %(zeo_client_cache_size)s
+      %(zeo_client_client)s
+    </zeoclient>
+""".strip()
+
+zeo_blob_storage_template="""
+    # Blob-enabled ZEOStorage database
+    <zeoclient>
+      blob-dir %(zeo_blob_storage)s
+      shared-blob-dir %(zeo_shared_blob_dir)s
+      server %(zeo_address)s
+      storage %(zeo_storage)s
+      name zeostorage
+      var %(zeo_var_dir)s
       cache-size %(zeo_client_cache_size)s
       %(zeo_client_client)s
     </zeoclient>

@@ -22,12 +22,23 @@ zope2_location = os.path.join(current_dir, 'zope2')
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
 
-    # Install the recipe in develop mode
-    zc.buildout.testing.install_develop('collective.recipe.filestorage', test)
-
     # Install any other recipes that should be available in the tests
     zc.buildout.testing.install('plone.recipe.zope2instance', test)
     zc.buildout.testing.install('zc.recipe.egg', test)
+
+    # Install the recipe in develop mode
+    zc.buildout.testing.install_develop('collective.recipe.filestorage', test)
+    
+    # Add a base.cfg we can extend
+    zc.buildout.testing.write('base.cfg', '''
+[buildout]
+index = http://pypi.python.org/simple
+versions = versions
+[versions]
+# pin to a version that doesn't pull in an eggified Zope
+plone.recipe.zope2instance = 3.6
+''')
+
 
 def test_suite():
     suite = unittest.TestSuite((
