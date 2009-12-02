@@ -66,7 +66,7 @@ class Recipe(object):
                 os.makedirs(fs_dir)
             
             # create blobstorage dirs
-            blob_storage = os.path.join('var', '%(fs_part_name)s')
+            blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
             if self._subpart_option(subpart, 'blob-storage', default=''):
                 blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
                 if not blob_storage.startswith(os.path.sep):
@@ -114,7 +114,7 @@ class Recipe(object):
         location = os.path.join(self.buildout['buildout']['directory'], location)
         
         storage_template = file_storage_template
-        blob_storage = os.path.join('var', '%(fs_part_name)s')
+        blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
         blob_enabled = False
         if self._subpart_option(subpart, 'blob-storage', default=''):
             blob_enabled = True
@@ -144,7 +144,7 @@ class Recipe(object):
                 zeo_blob_storage = os.path.join(self.buildout['buildout']['directory'], zeo_blob_storage)
             zeo_shared_blob_dir = self._subpart_option(subpart, 'zeo-shared-blob-dir', default='on')
             if blob_enabled:
-                storage_template = zeo_blob_storage_template
+                zeo_storage_template = zeo_blob_storage_template
             
             storage_snippet = zeo_storage_template % dict(
                 zeo_address = zeo_address,
@@ -182,7 +182,7 @@ class Recipe(object):
         zeo_storage = self._subpart_option(subpart, 'zeo-storage', default='%(fs_part_name)s')
         
         storage_template = file_storage_template
-        blob_storage = os.path.join('var', '%(fs_part_name)s')
+        blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
         if self._subpart_option(subpart, 'blob-storage', default=''):
             blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
             if not blob_storage.startswith(os.path.sep):
