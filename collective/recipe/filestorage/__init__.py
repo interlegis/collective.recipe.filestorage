@@ -236,7 +236,7 @@ file_storage_template="""
 
 blob_storage_zodb_3_8_template="""
     # Blob-enabled FileStorage database
-    <blobstorage>
+    <blobstorage %(fs_name)s>
       blob-dir %(blob_storage)s
       <filestorage %(fs_name)s>
         path %(fs_path)s
