@@ -221,7 +221,7 @@ class Recipe(object):
             )
     
     def _blob_storage_template(self, part):
-        if part.has_key('zope2-location'):
+        if self.buildout[part].has_key('zope2-location'):
             # non-eggified Zope; assume ZODB 3.8.x
             return blob_storage_zodb_3_8_template
         else:
