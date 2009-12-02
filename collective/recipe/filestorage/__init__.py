@@ -240,7 +240,6 @@ blob_storage_zodb_3_8_template="""
       blob-dir %(blob_storage)s
       <filestorage %(fs_name)s>
         path %(fs_path)s
-        blob-dir %(blob_storage)s
       </filestorage>
     </blobstorage>
 """
