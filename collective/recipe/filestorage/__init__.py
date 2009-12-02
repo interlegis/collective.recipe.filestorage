@@ -270,7 +270,7 @@ zeo_blob_storage_template="""
       server %(zeo_address)s
       storage %(zeo_storage)s
       name zeostorage
-      var %(zeo_var_dir)s
+      var %(zeo_client_var)s
       cache-size %(zeo_client_cache_size)s
       %(zeo_client_client)s
     </zeoclient>
