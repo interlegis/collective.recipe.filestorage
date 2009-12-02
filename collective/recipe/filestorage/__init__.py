@@ -121,7 +121,7 @@ class Recipe(object):
             blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
             if not blob_storage.startswith(os.path.sep):
                 blob_storage = os.path.join(self.buildout['buildout']['directory'], blob_storage)
-            storage_template = blob_storage_template
+            storage_template = self._blob_storage_template(zope_part)
         storage_snippet = storage_template % dict(
             fs_name = '',
             fs_path = location,
@@ -187,7 +187,7 @@ class Recipe(object):
             blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
             if not blob_storage.startswith(os.path.sep):
                 blob_storage = os.path.join(self.buildout['buildout']['directory'], blob_storage)
-            storage_template = blob_storage_template
+            storage_template = self._blob_storage_template(zeo_part)
         
         storage_snippet = storage_template % dict(
             fs_name=zeo_storage,
@@ -219,7 +219,14 @@ class Recipe(object):
         return val % dict(
             fs_part_name = subpart
             )
-        
+    
+    def _blob_storage_template(self, part):
+        if part.has_key('zope2-location'):
+            # non-eggified Zope; assume ZODB 3.8.x
+            return blob_storage_zodb_3_8_template
+        else:
+            return blob_storage_zodb_3_9_template
+    
 # Storage snippets for zope.conf template
 file_storage_template="""
     <filestorage %(fs_name)s>
@@ -227,9 +234,7 @@ file_storage_template="""
     </filestorage>
 """
 
-# we use a blobstorage wrapper AND a blob-dir within the filestorage
-# stanza for compatibility with both ZODB 3.8.x and 3.9.x
-blob_storage_template="""
+blob_storage_zodb_3_8_template="""
     # Blob-enabled FileStorage database
     <blobstorage>
       blob-dir %(blob_storage)s
@@ -238,6 +243,13 @@ blob_storage_template="""
         blob-dir %(blob_storage)s
       </filestorage>
     </blobstorage>
+"""
+
+blob_storage_zodb_3_9_template="""
+    <filestorage %(fs_name)s>
+      path %(fs_path)s
+      blob-dir %(blob_storage)s
+    </filestorage>
 """
 
 zeo_file_storage_template="""
