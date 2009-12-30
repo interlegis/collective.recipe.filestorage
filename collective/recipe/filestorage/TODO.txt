@@ -1,5 +1,4 @@
-before next release:
 [ ] make sure the mode setting for new blobstorage dirs gets set correctly
 
-nice to have later:
+nice to have:
 [ ] relstorage support

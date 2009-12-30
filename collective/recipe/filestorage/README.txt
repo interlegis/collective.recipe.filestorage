@@ -175,8 +175,7 @@ We can override the defaults for a number of settings::
     <BLANKLINE>
     <zodb_db my-fs_db>
         cache-size 1000
-        # Blob-enabled FileStorage database
-        <blobstorage>
+        <blobstorage >
           blob-dir .../var/blobstorage-my-fs
           <filestorage >
             path .../var/filestorage/my-fs/Data.fs
@@ -397,8 +396,7 @@ As above, we can override a number of the default parameters::
     %define INSTANCE /sample-buildout/parts/zeoserver
     ...
     <BLANKLINE>
-        # Blob-enabled FileStorage database
-        <blobstorage>
+        <blobstorage my-fs_storage>
           blob-dir /sample-buildout/var/blobstorage-my-fs
           <filestorage my-fs_storage>
             path /sample-buildout/var/filestorage/my-fs/Data.fs
@@ -413,6 +411,8 @@ As above, we can override a number of the default parameters::
     <zodb_db my-fs_db>
      cache-size 1000
      <zeoclient>
+       blob-dir /sample-buildout/var/blobstorage-my-fs
+       shared-blob-dir on
        server 8101
        storage my-fs_storage
        name my-fs_zeostorage_name
@@ -431,6 +431,8 @@ As above, we can override a number of the default parameters::
     <zodb_db my-fs_db>
      cache-size 1000
      <zeoclient>
+       blob-dir /sample-buildout/var/blobstorage-my-fs
+       shared-blob-dir on
        server 8101
        storage my-fs_storage
        name my-fs_zeostorage_name

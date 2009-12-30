@@ -235,7 +235,6 @@ file_storage_template="""
 """
 
 blob_storage_zodb_3_8_template="""
-    # Blob-enabled FileStorage database
     <blobstorage %(fs_name)s>
       blob-dir %(blob_storage)s
       <filestorage %(fs_name)s>
@@ -263,13 +262,12 @@ zeo_file_storage_template="""
 """.strip()
 
 zeo_blob_storage_template="""
-    # Blob-enabled ZEOStorage database
     <zeoclient>
       blob-dir %(zeo_blob_storage)s
       shared-blob-dir %(zeo_shared_blob_dir)s
       server %(zeo_address)s
       storage %(zeo_storage)s
-      name zeostorage
+      name %(zeo_client_name)s
       var %(zeo_client_var)s
       cache-size %(zeo_client_cache_size)s
       %(zeo_client_client)s
