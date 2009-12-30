@@ -1,4 +1,4 @@
-0.4 (unreleased)
+0.4 (2009-12-30)
 ================
 
  - Add support for creating blob storages associated with the created
