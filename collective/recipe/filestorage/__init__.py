@@ -25,9 +25,9 @@ class Recipe(object):
                 part = self.buildout[part_name]
                 if not part.has_key('recipe'):
                     continue
-                elif part['recipe'] == 'plone.recipe.zope2zeoserver':
+                elif part['recipe'] in ('plone.recipe.zope2zeoserver', 'plone.recipe.zeoserver'):
                     if self.zeo_part is not None:
-                        raise UserError, '[collective.recipe.filestorage] "%s" part found multiple plone.recipe.zope2zeoserver parts; please specify which one to use with the "zeo" option.' % name
+                        raise UserError, '[collective.recipe.filestorage] "%s" part found multiple zeoserver parts; please specify which one to use with the "zeo" option.' % name
                     self.zeo_part = part_name
                     zeo_address = part.get('zeo-address', 8100)
                 
