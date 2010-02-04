@@ -1,4 +1,4 @@
-0.5 (unreleased)
+0.5 (2010-02-03)
 ================
 
  - Support plone.recipe.zeoserver in addition to plone.recipe.zope2zeoserver.
