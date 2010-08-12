@@ -41,8 +41,6 @@ class Recipe(object):
                 elif part['recipe'] == 'plone.recipe.zope2instance':
                     if zeo_address is None or zeo_address == part.get('zeo-address', 8100):
                         self.zope_parts.append(part_name)
-        if len(self.zope_parts) == 0:
-            raise UserError, '[collective.recipe.filestorage] "%s" part requires at least one plone.recipe.zope2instance part.' % name
                 
         # make sure this part is before any associated zeo/zope parts in the buildout parts list
         self._validate_part_order()
