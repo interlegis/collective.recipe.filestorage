@@ -543,27 +543,7 @@ error::
     <BLANKLINE>
 
 
-A buildout with the filestorage recipe must include at least one part using the plone.recipe.zope2instance recipe::
-
-    >>> write('buildout.cfg',
-    ... '''
-    ... [buildout]
-    ... extends = base.cfg
-    ... parts =
-    ...     filestorage
-    ...
-    ... [filestorage]
-    ... recipe = collective.recipe.filestorage
-    ... parts =
-    ...     my-fs
-    ... ''' % globals())
-    >>> print system(join('bin', 'buildout') + ' -q')
-    While:
-    ...
-    Error: [collective.recipe.filestorage] "filestorage" part requires at least one plone.recipe.zope2instance part.
-
-
-Buildouts with multiple plone.recipe.zope2zeoserver parts will result in an
+Buildouts with multiple zeoserver parts will result in an
 error if the desired ZEO to associate with is not explicitly specified::
 
     >>> write('buildout.cfg',
@@ -605,7 +585,7 @@ error if the desired ZEO to associate with is not explicitly specified::
     >>> print system(join('bin', 'buildout') + ' -q')
     While:
     ...
-    Error: [collective.recipe.filestorage] "filestorage" part found multiple plone.recipe.zope2zeoserver parts; please specify which one to use with the "zeo" option.
+    Error: [collective.recipe.filestorage] "filestorage" part found multiple zeoserver parts; please specify which one to use with the "zeo" option.
 
 Specifying a nonexistent zeo should result in an error::
 
