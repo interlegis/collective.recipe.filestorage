@@ -126,7 +126,7 @@ class Recipe(object):
             blob_storage = blob_storage,
             )
         
-        if self.zeo_part and zope_options.get('zeo-client', 'false').lower() in ('yes', 'true', 'on', '1'):
+        if zope_options.get('zeo-client', 'false').lower() in ('yes', 'true', 'on', '1'):
             zeo_address = self._subpart_option(subpart, 'zeo-address', default='8100', inherit=(zope_part, self.zeo_part))
             zeo_client_cache_size = self._subpart_option(subpart, 'zeo-client-cache-size', default='30MB', inherit=zope_part)
             zeo_client_client = self._subpart_option(subpart, 'zeo-client-client', default='', inherit=zope_part)
