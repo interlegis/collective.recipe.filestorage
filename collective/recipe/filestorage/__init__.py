@@ -128,6 +128,14 @@ class Recipe(object):
         
         if zope_options.get('zeo-client', 'false').lower() in ('yes', 'true', 'on', '1'):
             zeo_address = self._subpart_option(subpart, 'zeo-address', default='8100', inherit=(zope_part, self.zeo_part))
+            zeo_addresses = zeo_address.split(' ')
+            zeo_address_list = ''
+            for address in zeo_addresses:
+                if not address:
+                    continue
+                zeo_address_list += zeo_address_list_template % dict(
+                                    zeo_address = address)
+
             zeo_client_cache_size = self._subpart_option(subpart, 'zeo-client-cache-size', default='30MB', inherit=zope_part)
             zeo_client_client = self._subpart_option(subpart, 'zeo-client-client', default='', inherit=zope_part)
             if zeo_client_client:
@@ -145,7 +153,7 @@ class Recipe(object):
                 zeo_storage_template = zeo_blob_storage_template
             
             storage_snippet = zeo_storage_template % dict(
-                zeo_address = zeo_address,
+                zeo_address_list = zeo_address_list,
                 zeo_client_cache_size = zeo_client_cache_size,
                 zeo_client_client = zeo_client_client,
                 zeo_storage = zeo_storage,
@@ -248,9 +256,13 @@ blob_storage_zodb_3_9_template="""
     </filestorage>
 """
 
+zeo_address_list_template="""
+      server %(zeo_address)s
+"""
+
 zeo_file_storage_template="""
     <zeoclient>
-      server %(zeo_address)s
+      %(zeo_address_list)s
       storage %(zeo_storage)s
       name %(zeo_client_name)s
       var %(zeo_client_var)s
@@ -263,7 +275,7 @@ zeo_blob_storage_template="""
     <zeoclient>
       blob-dir %(zeo_blob_storage)s
       shared-blob-dir %(zeo_shared_blob_dir)s
-      server %(zeo_address)s
+      %(zeo_address_list)s
       storage %(zeo_storage)s
       name %(zeo_client_name)s
       var %(zeo_client_var)s
