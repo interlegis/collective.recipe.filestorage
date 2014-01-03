@@ -199,6 +199,7 @@ class Recipe(object):
             fs_name=zeo_storage,
             fs_path=location,
             blob_storage=blob_storage,
+            abc = '',
             )
 
         zeo_conf_additional = zeo_options.get('zeo-conf-additional', '')
@@ -227,11 +228,19 @@ class Recipe(object):
             )
     
     def _blob_storage_template(self, part):
-        if self.buildout[part].has_key('zope2-location'):
-            # non-eggified Zope; assume ZODB 3.8.x
-            return blob_storage_zodb_3_8_template
+        import pdb; pdb.set_trace()
+        if '[zrs]' in self.buildout['zeo']['recipe']:
+            if self.buildout[part].has_key('zope2-location'):
+                # non-eggified Zope; assume ZODB 3.8.x
+                return zrs_blob_storage_zodb_3_8_template
+            else:
+                return zrs_blob_storage_zodb_3_9_template
         else:
-            return blob_storage_zodb_3_9_template
+            if self.buildout[part].has_key('zope2-location'):
+                # non-eggified Zope; assume ZODB 3.8.x
+                return blob_storage_zodb_3_8_template
+            else:
+                return blob_storage_zodb_3_9_template
     
 # Storage snippets for zope.conf template
 file_storage_template="""
@@ -254,6 +263,30 @@ blob_storage_zodb_3_9_template="""
       path %(fs_path)s
       blob-dir %(blob_storage)s
     </filestorage>
+"""
+
+zrs_blob_storage_zodb_3_8_template="""
+    <zrs %(fs_name)s>
+        replicate-to 5000
+        keep-alive-delay 60
+        <blobstorage %(fs_name)s>
+          blob-dir %(blob_storage)s
+          <filestorage %(fs_name)s>
+            path %(fs_path)s
+          </filestorage>
+        </blobstorage>
+    </zrs>
+"""
+
+zrs_blob_storage_zodb_3_9_template="""
+    <zrs %(fs_name)s>
+        replicate-to 5000
+        keep-alive-delay 60
+        <filestorage %(fs_name)s>
+          path %(fs_path)s
+          blob-dir %(blob_storage)s
+        </filestorage>
+    </zrs>
 """
 
 zeo_address_list_template="""
