@@ -19,7 +19,7 @@ class Recipe(object):
             if self.buildout.has_key(self.zeo_part):
                 zeo_address = self.buildout[self.zeo_part].get('zeo-address', 8100)
             else:
-                raise UserError, '[collective.recipe.filestorage] "%s" part specifies nonexistant zeo part "%s".' % (name, self.zeo_part)
+                raise UserError, '[collective.recipe.filestorage] "%s" part specifies nonexistent zeo part "%s".' % (name, self.zeo_part)
         else:
             for part_name in active_parts:
                 part = self.buildout[part_name]
@@ -114,6 +114,21 @@ class Recipe(object):
         storage_template = file_storage_template
         blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
         blob_enabled = False
+        replicate_from = ''
+        if 'replicate-from' in self.buildout['zeo']:
+            replicate_from = self.buildout['zeo']['replicate-from']
+            if replicate_from:
+                replicate_from = 'replicate-from ' + replicate_from
+        replicate_to = ''
+        if 'replicate-to' in self.buildout['zeo']:
+            replicate_to = self.buildout['zeo']['replicate-to']
+            if replicate_to:
+                replicate_to = 'replicate-to ' + replicate_to
+        keep_alive_delay = ''
+        if 'keep-alive-delay' in self.buildout['zeo']:
+            keep_alive_delay = self.buildout['zeo']['keep-alive-delay']
+            if keep_alive_delay:
+                keep_alive_delay = 'keep-alive-delay ' + keep_alive_delay
         if self._subpart_option(subpart, 'blob-storage', default=''):
             blob_enabled = True
             blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
@@ -124,6 +139,9 @@ class Recipe(object):
             fs_name = '',
             fs_path = location,
             blob_storage = blob_storage,
+            replicate_from = replicate_from,
+            replicate_to = replicate_to,
+            keep_alive_delay = keep_alive_delay,
             )
         
         if zope_options.get('zeo-client', 'false').lower() in ('yes', 'true', 'on', '1'):
@@ -189,6 +207,21 @@ class Recipe(object):
         
         storage_template = file_storage_template
         blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
+        replicate_from = ''
+        if 'replicate-from' in self.buildout['zeo']:
+            replicate_from = self.buildout['zeo']['replicate-from']
+            if replicate_from:
+                replicate_from = 'replicate-from ' + replicate_from
+        replicate_to = ''
+        if 'replicate-to' in self.buildout['zeo']:
+            replicate_to = self.buildout['zeo']['replicate-to']
+            if replicate_to:
+                replicate_to = 'replicate-to ' + replicate_to
+        keep_alive_delay = ''
+        if 'keep-alive-delay' in self.buildout['zeo']:
+            keep_alive_delay = self.buildout['zeo']['keep-alive-delay']
+            if keep_alive_delay:
+                keep_alive_delay = 'keep-alive-delay ' + keep_alive_delay
         if self._subpart_option(subpart, 'blob-storage', default=''):
             blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
             if not blob_storage.startswith(os.path.sep):
@@ -199,7 +232,9 @@ class Recipe(object):
             fs_name=zeo_storage,
             fs_path=location,
             blob_storage=blob_storage,
-            abc = '',
+            replicate_from = replicate_from,
+            replicate_to = replicate_to,
+            keep_alive_delay = keep_alive_delay,
             )
 
         zeo_conf_additional = zeo_options.get('zeo-conf-additional', '')
@@ -228,7 +263,6 @@ class Recipe(object):
             )
     
     def _blob_storage_template(self, part):
-        import pdb; pdb.set_trace()
         if '[zrs]' in self.buildout['zeo']['recipe']:
             if self.buildout[part].has_key('zope2-location'):
                 # non-eggified Zope; assume ZODB 3.8.x
@@ -267,8 +301,9 @@ blob_storage_zodb_3_9_template="""
 
 zrs_blob_storage_zodb_3_8_template="""
     <zrs %(fs_name)s>
-        replicate-to 5000
-        keep-alive-delay 60
+        %(replicate_from)s
+        %(replicate_to)s
+        %(keep_alive_delay)s
         <blobstorage %(fs_name)s>
           blob-dir %(blob_storage)s
           <filestorage %(fs_name)s>
@@ -280,8 +315,9 @@ zrs_blob_storage_zodb_3_8_template="""
 
 zrs_blob_storage_zodb_3_9_template="""
     <zrs %(fs_name)s>
-        replicate-to 5000
-        keep-alive-delay 60
+        %(replicate_from)s
+        %(replicate_to)s
+        %(keep_alive_delay)s
         <filestorage %(fs_name)s>
           path %(fs_path)s
           blob-dir %(blob_storage)s
