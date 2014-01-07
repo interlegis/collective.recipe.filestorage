@@ -154,6 +154,10 @@ class Recipe(object):
                 zeo_address_list += zeo_address_list_template % dict(
                                     zeo_address = address)
 
+            read_only = self._subpart_option(subpart, 'read-only', default='false', inherit=zope_part)
+            zeo_client_read_only_fallback = self._subpart_option(subpart, 'zeo-client-read-only-fallback', default='', inherit=zope_part)
+            if zeo_client_read_only_fallback:
+                zeo_client_read_only_fallback = 'read-only-fallback %s' % zeo_client_read_only_fallback
             zeo_client_cache_size = self._subpart_option(subpart, 'zeo-client-cache-size', default='30MB', inherit=zope_part)
             zeo_client_client = self._subpart_option(subpart, 'zeo-client-client', default='', inherit=zope_part)
             if zeo_client_client:
@@ -179,6 +183,8 @@ class Recipe(object):
                 zeo_client_var=zeo_client_var,
                 zeo_blob_storage = zeo_blob_storage,
                 zeo_shared_blob_dir = zeo_shared_blob_dir,
+                read_only = read_only,
+                zeo_client_read_only_fallback = zeo_client_read_only_fallback,
                 )
         
         zodb_cache_size = self._subpart_option(subpart, 'zodb-cache-size', default='5000', inherit=zope_part)
@@ -331,6 +337,8 @@ zeo_address_list_template="""
 
 zeo_file_storage_template="""
     <zeoclient>
+      read-only %(read_only)s
+      %(zeo_client_read_only_fallback)s  
       %(zeo_address_list)s
       storage %(zeo_storage)s
       name %(zeo_client_name)s
@@ -342,6 +350,8 @@ zeo_file_storage_template="""
 
 zeo_blob_storage_template="""
     <zeoclient>
+      read-only %(read_only)s
+      %(zeo_client_read_only_fallback)s  
       blob-dir %(zeo_blob_storage)s
       shared-blob-dir %(zeo_shared_blob_dir)s
       %(zeo_address_list)s
