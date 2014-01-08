@@ -117,7 +117,7 @@ class Recipe(object):
         replicate_from = ''
         replicate_to = ''
         keep_alive_delay = ''
-        if self.zeo_part:
+        if self.zeo_part and self.zeo_part in self.buildout:
             replicate_from = self.buildout[self.zeo_part].get('replicate-from', '')
             if replicate_from:
                 replicate_from = 'replicate-from ' + replicate_from
