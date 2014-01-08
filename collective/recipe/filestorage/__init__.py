@@ -115,18 +115,16 @@ class Recipe(object):
         blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
         blob_enabled = False
         replicate_from = ''
-        if 'replicate-from' in self.buildout['zeo']:
-            replicate_from = self.buildout['zeo']['replicate-from']
+        replicate_to = ''
+        keep_alive_delay = ''
+        if self.zeo_part:
+            replicate_from = self.buildout[self.zeo_part].get('replicate-from', '')
             if replicate_from:
                 replicate_from = 'replicate-from ' + replicate_from
-        replicate_to = ''
-        if 'replicate-to' in self.buildout['zeo']:
-            replicate_to = self.buildout['zeo']['replicate-to']
+            replicate_to = self.buildout[self.zeo_part].get('replicate-to', '')
             if replicate_to:
                 replicate_to = 'replicate-to ' + replicate_to
-        keep_alive_delay = ''
-        if 'keep-alive-delay' in self.buildout['zeo']:
-            keep_alive_delay = self.buildout['zeo']['keep-alive-delay']
+            keep_alive_delay = self.buildout[self.zeo_part].get('keep-alive-delay', '')
             if keep_alive_delay:
                 keep_alive_delay = 'keep-alive-delay ' + keep_alive_delay
         if self._subpart_option(subpart, 'blob-storage', default=''):
@@ -213,21 +211,15 @@ class Recipe(object):
         
         storage_template = file_storage_template
         blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
-        replicate_from = ''
-        if 'replicate-from' in self.buildout['zeo']:
-            replicate_from = self.buildout['zeo']['replicate-from']
-            if replicate_from:
-                replicate_from = 'replicate-from ' + replicate_from
-        replicate_to = ''
-        if 'replicate-to' in self.buildout['zeo']:
-            replicate_to = self.buildout['zeo']['replicate-to']
-            if replicate_to:
-                replicate_to = 'replicate-to ' + replicate_to
-        keep_alive_delay = ''
-        if 'keep-alive-delay' in self.buildout['zeo']:
-            keep_alive_delay = self.buildout['zeo']['keep-alive-delay']
-            if keep_alive_delay:
-                keep_alive_delay = 'keep-alive-delay ' + keep_alive_delay
+        replicate_from = zeo_options.get('replicate-from', '')
+        if replicate_from:
+            replicate_from = 'replicate-from ' + replicate_from
+        replicate_to = zeo_options.get('replicate-to', '')
+        if replicate_to:
+            replicate_to = 'replicate-to ' + replicate_to
+        keep_alive_delay = zeo_options.get('keep-alive-delay', '')
+        if keep_alive_delay:
+            keep_alive_delay = 'keep-alive-delay ' + keep_alive_delay
         if self._subpart_option(subpart, 'blob-storage', default=''):
             blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
             if not blob_storage.startswith(os.path.sep):
@@ -269,7 +261,7 @@ class Recipe(object):
             )
     
     def _blob_storage_template(self, part):
-        if '[zrs]' in self.buildout['zeo']['recipe']:
+        if self.zeo_part and 'recipe' in self.buildout[self.zeo_part] and '[zrs]' in self.buildout[self.zeo_part]['recipe']:
             if self.buildout[part].has_key('zope2-location'):
                 # non-eggified Zope; assume ZODB 3.8.x
                 return zrs_blob_storage_zodb_3_8_template
