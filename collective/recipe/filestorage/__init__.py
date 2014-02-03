@@ -42,6 +42,9 @@ class Recipe(object):
                     if zeo_address is None or zeo_address == part.get('zeo-address', 8100):
                         self.zope_parts.append(part_name)
                 
+        # figure out c.r.backup recipe
+        self.backup_part = options.get('backup', None)
+
         # make sure this part is before any associated zeo/zope parts in the buildout parts list
         self._validate_part_order()
         
@@ -52,6 +55,8 @@ class Recipe(object):
                 self._inject_zope_conf(zope_part, subpart)
             if self.zeo_part is not None:
                 self._inject_zeo_conf(self.zeo_part, subpart)
+            if self.backup_part is not None:
+                self._inject_backup_additional(self.backup_part, subpart)
 
     def install(self):
         
@@ -196,6 +201,29 @@ class Recipe(object):
         zeo_conf_additional = zeo_options.get('zeo-conf-additional', '')
         zeo_options['zeo-conf-additional'] = zeo_conf_additional + storage_snippet
     
+    def _inject_backup_additional(self, backup_part, subpart):
+        backup_options = self.buildout[backup_part]
+
+        location = self._subpart_option(subpart, 'location', default=os.path.join('var', 'filestorage', '%(fs_part_name)s', '%(fs_part_name)s.fs'))
+        location = os.path.join(self.buildout['buildout']['directory'], location)
+        zeo_storage = self._subpart_option(subpart, 'zeo-storage', default='%(fs_part_name)s')
+        backup_template = "%(fs_name)s %(fs_path)s"
+        blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
+        if self._subpart_option(subpart, 'blob-storage', default=''):
+            blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
+            if not blob_storage.startswith(os.path.sep):
+                blob_storage = os.path.join(self.buildout['buildout']['directory'], blob_storage)
+            backup_template = "%(fs_name)s %(fs_path)s %(blob_storage)s"
+
+        additional = backup_template % dict(
+            fs_name=zeo_storage,
+            fs_path=location,
+            blob_storage=blob_storage,
+            )
+
+        backup_additionals = backup_options.get('additional_filestorages', '')
+        backup_options['additional_filestorages'] = '\n'.join([backup_additionals, additional])
+
     def _subpart_option(self, subpart, option, default=None, inherit=()):
         """ Retrieve an option for a filestorage subpart, perhaps falling back to other specified parts.
             Also substitutes the name of the subpart. 
