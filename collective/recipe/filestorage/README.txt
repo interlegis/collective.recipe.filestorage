@@ -23,6 +23,9 @@ zopes
     the extra filestorage.  Defaults to all plone.recipe.zope2instance parts
     connected to the associated zeoserver part, if any, or all
     plone.recipe.zope2instance parts, if no ZEO is found.
+backup
+    The name of a collective.recipe.backup part to which we want to add extra
+    filestorage/blobstorage backup entries.
     
 The following options affect the generated zope.conf and zeo.conf.  Each may be
 specified for all filestorage subparts in the collective.recipe.filestorage
