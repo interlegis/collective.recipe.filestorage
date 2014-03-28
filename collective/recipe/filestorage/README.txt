@@ -41,7 +41,13 @@ zodb-cache-size
     will try to hold.  Inherits from the associated zope part.  Defaults to
     5000.
 zodb-mountpoint
-    Set the path to the mountpoint.  Defaults to '/%(fs_part_name)s'.
+    Set the path to the mountpoint.  Defaults to ``/%(fs_part_name)s``.
+    If the object is being mounted at a different path than its location
+    in the source database, two paths may be provided using the
+    ``virtualpath:realpath`` syntax. For example, when mounting ``/source/bar``
+    from ``source.fs`` at ``/foo/bar`` in ``target.fs``:
+    ``/foo/bar:/%(fs_part_name)s/bar``. **Note**: the name of the mount point
+    and the mounted object must be the same, i.e. ``/foo:/bar`` will fail.
 zodb-container-class
     Set the class of the object being mounted.  Defaults to not being set.
 zeo-address
