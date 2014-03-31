@@ -31,6 +31,7 @@ entry_points = {"zc.buildout": ["default = %s" % entry_point]}
 
 tests_require=['zope.testing']
 
+
 setup(name='collective.recipe.filestorage',
       version=version,
       description="This recipe aids the creation and management of multiple Zope 2 filestorages.",
