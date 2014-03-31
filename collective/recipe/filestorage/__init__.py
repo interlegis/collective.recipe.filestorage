@@ -5,13 +5,14 @@ import os
 
 from zc.buildout import UserError
 
+
 class Recipe(object):
     """zc.buildout recipe"""
 
     def __init__(self, buildout, name, options):
         self.buildout, self.name, self.options = buildout, name, options
         active_parts = [p.strip() for p in self.buildout['buildout']['parts'].split()]
-        
+
         # figure out which ZEO we're going to inject filestorage configuration into, if any
         zeo_address = None
         self.zeo_part = options.get('zeo', None)
@@ -44,11 +45,16 @@ class Recipe(object):
                 
         # figure out c.r.backup recipe
         self.backup_part = options.get('backup', None)
+        if self.backup_part is not None:
+            if not self.backup_part in self.buildout:
+                raise UserError, '[collective.recipe.filestorage] "%s" part specifies nonexistant backup part "%s".' % (name, self.backup_part)
 
-        # make sure this part is before any associated zeo/zope parts in the buildout parts list
+        # make sure this part is before any associated zeo/zope parts in the
+        # buildout parts list
         self._validate_part_order()
         
-        # inject the extra sections into the correct zope-conf-additional or zeo-conf-additional variables.
+        # inject the extra sections into the correct zope-conf-additional or
+        # zeo-conf-additional variables.
         self.subparts = options.get('parts', '').split()
         for subpart in self.subparts:
             for zope_part in self.zope_parts:
@@ -92,13 +98,15 @@ class Recipe(object):
         pass
         
     def _validate_part_order(self):
-        """ Make sure this part is before any associated zeo/zope parts in the buildout parts list.
+        """ Make sure this part is before any associated zeo/zope parts in the
+            buildout parts list.
         """
-        
         injector_parts = [self.name]
         target_parts = self.zope_parts[:]
         if self.zeo_part is not None:
             target_parts.append(self.zeo_part)
+        if self.backup_part is not None:
+            target_parts.append(self.backup_part)
         for part_name in self.buildout['buildout']['parts'].split():
             if part_name in injector_parts:
                 injector_parts.remove(part_name)

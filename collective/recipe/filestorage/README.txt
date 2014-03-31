@@ -24,8 +24,8 @@ zopes
     connected to the associated zeoserver part, if any, or all
     plone.recipe.zope2instance parts, if no ZEO is found.
 backup
-    The name of a collective.recipe.backup part to which we want to add extra
-    filestorage/blobstorage backup entries.
+    The name of a collective.recipe.backup (>= 2.7) part to which we want to
+    add extra filestorage/blobstorage backup entries.
     
 The following options affect the generated zope.conf and zeo.conf.  Each may be
 specified for all filestorage subparts in the collective.recipe.filestorage
@@ -513,7 +513,147 @@ will only be added to the Zopes using that ZEO, by default::
     >>> 'my-fs' in open('parts/other-zope/etc/zope.conf').read()
     False
 
-    
+Backup integration
+==================
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... extends = base.cfg
+    ... parts =
+    ...     filestorage
+    ...     instance
+    ...     backup
+    ...
+    ... [instance]
+    ... recipe = plone.recipe.zope2instance
+    ... zope2-location = %(zope2_location)s
+    ... user = me
+    ...
+    ... [backup]
+    ... recipe = collective.recipe.backup>=2.7
+    ...
+    ... [filestorage]
+    ... recipe = collective.recipe.filestorage
+    ... parts =
+    ...     foo
+    ...     bar
+    ... backup = backup
+    ... '''.replace('%(zope2_location)s', zope2_location))
+    >>> print system(join('bin', 'buildout') + ' -q')
+    >>> print re.search(
+    ...     r"storages\s*=\s*\[([^\]]+)\]",
+    ...     open('bin/backup').read(),
+    ...     flags=re.M).group(1)
+    {'backup_location': '/sample-buildout/var/backups_foo',
+      'blobdir': '',
+      'datafs': '/sample-buildout/var/filestorage/foo/foo.fs',
+      'snapshot_location': '/sample-buildout/var/snapshotbackups_foo',
+      'storage': 'foo'},
+     {'backup_location': '/sample-buildout/var/backups_bar',
+      'blobdir': '',
+      'datafs': '/sample-buildout/var/filestorage/bar/bar.fs',
+      'snapshot_location': '/sample-buildout/var/snapshotbackups_bar',
+      'storage': 'bar'},
+     {'backup_location': '/sample-buildout/var/backups',
+      'blobdir': '',
+      'datafs': '/sample-buildout/var/filestorage/Data.fs',
+      'snapshot_location': '/sample-buildout/var/snapshotbackups',
+      'storage': '1'}
+
+Backup with blob storage and custom filestorage location::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... extends = base.cfg
+    ... parts =
+    ...     filestorage
+    ...     instance
+    ...     backup
+    ...
+    ... [instance]
+    ... recipe = plone.recipe.zope2instance
+    ... zope2-location = %(zope2_location)s
+    ... user = me
+    ...
+    ... [backup]
+    ... recipe = collective.recipe.backup>=2.7
+    ...
+    ... [filestorage]
+    ... recipe = collective.recipe.filestorage
+    ... location = var/filestorage/%(fs_part_name)s/Data.fs
+    ... blob-storage = var/blobstorage-%(fs_part_name)s
+    ... zodb-name = %(fs_part_name)s_db
+    ... parts =
+    ...     foo
+    ...     bar
+    ... backup = backup
+    ... '''.replace('%(zope2_location)s', zope2_location))
+    >>> print system(join('bin', 'buildout') + ' -q')
+    >>> print re.search(
+    ...     r"storages\s*=\s*\[([^\]]+)\]",
+    ...     open('bin/backup').read(),
+    ...     flags=re.M).group(1)
+    {'backup_location': '/sample-buildout/var/backups_foo',
+      'blob_backup_location': '',
+      'blob_snapshot_location': '',
+      'blobdir': '/sample-buildout/var/blobstorage-foo',
+      'datafs': '/sample-buildout/var/filestorage/foo/Data.fs',
+      'snapshot_location': '/sample-buildout/var/snapshotbackups_foo',
+      'storage': 'foo'},
+     {'backup_location': '/sample-buildout/var/backups_bar',
+      'blob_backup_location': '',
+      'blob_snapshot_location': '',
+      'blobdir': '/sample-buildout/var/blobstorage-bar',
+      'datafs': '/sample-buildout/var/filestorage/bar/Data.fs',
+      'snapshot_location': '/sample-buildout/var/snapshotbackups_bar',
+      'storage': 'bar'},
+     {'backup_location': '/sample-buildout/var/backups',
+      'blobdir': '',
+      'datafs': '/sample-buildout/var/filestorage/Data.fs',
+      'snapshot_location': '/sample-buildout/var/snapshotbackups',
+      'storage': '1'}
+
+No backup integration::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... extends = base.cfg
+    ... parts =
+    ...     filestorage
+    ...     instance
+    ...     backup
+    ...
+    ... [instance]
+    ... recipe = plone.recipe.zope2instance
+    ... zope2-location = %(zope2_location)s
+    ... user = me
+    ...
+    ... [backup]
+    ... recipe = collective.recipe.backup>=2.7
+    ... additional_filestorages =
+    ...     lorem
+    ...     ipsum
+    ...
+    ... [filestorage]
+    ... recipe = collective.recipe.filestorage
+    ... parts =
+    ...     foo
+    ...     bar
+    ... '''.replace('%(zope2_location)s', zope2_location))
+    >>> print system(join('bin', 'buildout') + ' -q')
+    >>> 'lorem' in open('bin/backup').read()
+    True
+    >>> 'ipsum' in open('bin/backup').read()
+    True
+    >>> 'foo' in open('bin/backup').read()
+    False
+    >>> 'bar' in open('bin/backup').read()
+    False
+
+
 Error conditions
 ================
     
@@ -545,6 +685,34 @@ error::
     Error: [collective.recipe.filestorage] The "filestorage" part must be listed before the following parts in ${buildout:parts}: instance
     <BLANKLINE>
 
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... extends = base.cfg
+    ... parts =
+    ...     backup
+    ...     filestorage
+    ...     instance
+    ...
+    ... [instance]
+    ... recipe = plone.recipe.zope2instance
+    ... zope2-location = %(zope2_location)s
+    ... user = me
+    ...
+    ... [backup]
+    ... recipe = collective.recipe.backup>=2.7
+    ...
+    ... [filestorage]
+    ... recipe = collective.recipe.filestorage
+    ... parts =
+    ...     my-fs
+    ... backup = backup
+    ... ''' % globals())
+    >>> print system(join('bin', 'buildout') + ' -q')
+    While:
+    ...
+    Error: [collective.recipe.filestorage] The "filestorage" part must be listed before the following parts in ${buildout:parts}: instance, backup
+    <BLANKLINE>
 
 Buildouts with multiple zeoserver parts will result in an
 error if the desired ZEO to associate with is not explicitly specified::
@@ -621,6 +789,35 @@ Specifying a nonexistent zeo should result in an error::
     While:
     ...
     Error: [collective.recipe.filestorage] "filestorage" part specifies nonexistant zeo part "foobar".
+
+Specifying a nonexistent backup part should result in an error::
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... extends = base.cfg
+    ... parts =
+    ...     backup
+    ...     filestorage
+    ...     instance
+    ...
+    ... [instance]
+    ... recipe = plone.recipe.zope2instance
+    ... zope2-location = %(zope2_location)s
+    ... user = me
+    ...
+    ... [backup]
+    ... recipe = collective.recipe.backup>=2.7
+    ...
+    ... [filestorage]
+    ... recipe = collective.recipe.filestorage
+    ... parts =
+    ...     my-fs
+    ... backup = foobar
+    ... ''' % globals())
+    >>> print system(join('bin', 'buildout') + ' -q')
+    While:
+    ...
+    Error: [collective.recipe.filestorage] "filestorage" part specifies nonexistant backup part "foobar".
 
 So should specifying a nonexistent zope part::
 
@@ -728,7 +925,7 @@ which installs a script for running the tests.
 
 Just run::
 
-    python2.4 bootstrap.py
+    python2.7 bootstrap.py
     bin/buildout
     bin/test
 
