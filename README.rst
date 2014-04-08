@@ -246,13 +246,15 @@ Running the tests
 =================
 
 The github checkout of ``collective.recipe.filestorage`` includes a buildout
-which installs a script for running the tests.
-
-Just run::
+which installs a script for running the tests. For this to work, you need to
+have the test dependencies installed::
 
     python bootstrap.py
     bin/buildout
     bin/test
+
+Alternatively, you can change the final step to ``./bin/python setup.py test``
+which will retrieve the test dependencies and run the tests.
 
 Known issue: The tests run buildout in a separate process, so it's currently
 impossible to put a ``pdb`` breakpoint in the recipe and debug during the test.
