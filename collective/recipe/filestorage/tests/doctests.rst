@@ -13,7 +13,7 @@ Let's create and run a minimal buildout that adds an extra filestorage::
    ...
    ... [instance]
    ... recipe = plone.recipe.zope2instance
-   ... user = me
+   ... user = me:pass
    ...
    ... [filestorage]
    ... recipe = collective.recipe.filestorage
@@ -63,7 +63,7 @@ from the buildout::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... ''' % globals())
     >>> print system(join('bin', 'buildout') + ' -q')    
     >>> 'my-fs' in os.listdir(os.path.join(sample_buildout, 'var', 'filestorage'))
@@ -81,7 +81,7 @@ We can override the defaults for a number of settings::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ...
     ... [filestorage]
     ... recipe = collective.recipe.filestorage
@@ -125,7 +125,7 @@ the ``filestorage_`` prefix, like so::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ...
     ... [filestorage]
     ... recipe = collective.recipe.filestorage
@@ -165,11 +165,11 @@ but you can tell it to only add it to certain parts::
     ...
     ... [instance1]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ...
     ... [instance2]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ...
     ... [filestorage]
     ... recipe = collective.recipe.filestorage
@@ -203,12 +203,12 @@ Here is a minimal buildout including a ZEO server and two ZODB clients::
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ...
     ... [secondary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ...
     ... [filestorage]
@@ -285,12 +285,12 @@ As above, we can override a number of the default parameters::
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ...
     ... [secondary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ...
     ... [filestorage]
@@ -388,19 +388,19 @@ will only be added to the Zopes using that ZEO, by default::
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ... zeo-address = 8101
     ...
     ... [secondary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ... zeo-address = 8101
     ...
     ... [other-zope]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ... zeo-address = 8100
     ...
@@ -474,12 +474,12 @@ error if the desired ZEO to associate with is not explicitly specified::
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ...
     ... [secondary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ...
     ... [filestorage]
@@ -508,7 +508,7 @@ Specifying a nonexistent ZEO should result in an error::
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ...
     ... [filestorage]
@@ -538,7 +538,7 @@ So should specifying a nonexistent Zope part::
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ... zeo-client = 1
     ...
     ... [filestorage]
@@ -566,7 +566,7 @@ included in the buildout::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ...
     ... [filestorage]
     ... recipe = collective.recipe.filestorage
@@ -594,7 +594,7 @@ and the ``+=`` or ``-=`` options::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... user = me
+    ... user = me:pass
     ...
     ... [filestorage]
     ... recipe = collective.recipe.filestorage
