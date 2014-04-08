@@ -13,7 +13,6 @@ Let's create and run a minimal buildout that adds an extra filestorage::
    ...
    ... [instance]
    ... recipe = plone.recipe.zope2instance
-   ... zope2-location = %(zope2_location)s
    ... user = me
    ...
    ... [filestorage]
@@ -38,12 +37,12 @@ Our zope.conf should get the extra filestorage stanza automatically injected int
        mount-point /my-fs
    </zodb_db>
    <BLANKLINE>
-   
+
 The recipe will also create a directory for the new filestorage::
 
     >>> 'my-fs' in os.listdir(os.path.join(sample_buildout, 'var', 'filestorage'))
     True
-    
+
 Let's make sure that the conf files will be regenerated whenever we make a change to a filestorage part,
 even if the direct configuration for the zope/zeo parts hasn't changed::
 
@@ -64,13 +63,12 @@ from the buildout::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... ''' % globals())
     >>> print system(join('bin', 'buildout') + ' -q')    
     >>> 'my-fs' in os.listdir(os.path.join(sample_buildout, 'var', 'filestorage'))
     True
-    
+
 We can override the defaults for a number of settings::
 
     >>> write('buildout.cfg',
@@ -83,7 +81,6 @@ We can override the defaults for a number of settings::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ...
     ... [filestorage]
@@ -96,7 +93,6 @@ We can override the defaults for a number of settings::
     ... zodb-container-class = Products.ATContentTypes.content.folder.ATFolder
     ... parts =
     ...     my-fs
-    ... '''.replace('%(zope2_location)s', zope2_location))
     >>> print system(join('bin', 'buildout') + ' -q')
     >>> instance = os.path.join(sample_buildout, 'parts', 'instance')
     >>> print open(os.path.join(instance, 'etc', 'zope.conf')).read()
@@ -129,7 +125,6 @@ the ``filestorage_`` prefix, like so::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ...
     ... [filestorage]
@@ -170,12 +165,10 @@ but you can tell it to only add it to certain parts::
     ...
     ... [instance1]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ...
     ... [instance2]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ...
     ... [filestorage]
@@ -207,17 +200,14 @@ Here is a minimal buildout including a ZEO server and two ZODB clients::
     ...
     ... [zeoserver]
     ... recipe = plone.recipe.zope2zeoserver
-    ... zope2-location = %(zope2_location)s
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ...
     ... [secondary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ...
@@ -239,7 +229,7 @@ This should result in the appropriate additions to ``zeo.conf`` and both ``zope.
           path /sample-buildout/var/filestorage/my-fs/my-fs.fs
         </filestorage>
     <BLANKLINE>
-    
+
     >>> primary = os.path.join(sample_buildout, 'parts', 'primary')
     >>> print open(os.path.join(primary, 'etc', 'zope.conf')).read()
     %define INSTANCEHOME /sample-buildout/parts/primary
@@ -292,17 +282,14 @@ As above, we can override a number of the default parameters::
     ...
     ... [zeoserver]
     ... recipe = plone.recipe.zope2zeoserver
-    ... zope2-location = %(zope2_location)s
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ...
     ... [secondary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ...
@@ -319,7 +306,6 @@ As above, we can override a number of the default parameters::
     ... zeo-client-name = %(fs_part_name)s_zeostorage_name
     ... parts =
     ...     my-fs
-    ... '''.replace('%(zope2_location)s', zope2_location))
     >>> print system(join('bin', 'buildout') + ' -q')
     >>> zeoserver = os.path.join(sample_buildout, 'parts', 'zeoserver')
     >>> print open(os.path.join(zeoserver, 'etc', 'zeo.conf')).read()
@@ -394,31 +380,26 @@ will only be added to the Zopes using that ZEO, by default::
     ...
     ... [zeoserver1]
     ... recipe = plone.recipe.zope2zeoserver
-    ... zope2-location = %(zope2_location)s
     ... zeo-address = 8100
     ...
     ... [zeoserver2]
     ... recipe = plone.recipe.zope2zeoserver
-    ... zope2-location = %(zope2_location)s
     ... zeo-address = 8101
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ... zeo-address = 8101
     ...
     ... [secondary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ... zeo-address = 8101
     ...
     ... [other-zope]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ... zeo-address = 8100
@@ -439,10 +420,10 @@ will only be added to the Zopes using that ZEO, by default::
     >>> 'my-fs' in open('parts/other-zope/etc/zope.conf').read()
     False
 
-    
+
 Error conditions
 ================
-    
+
 Important note: You must place all parts using the
 collective.recipe.filestorage recipe before the part for the instances and
 zeoservers that you are adding the filestorage to.  Otherwise you'll get an
@@ -458,7 +439,6 @@ error::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ...
     ... [filestorage]
     ... recipe = collective.recipe.filestorage
@@ -488,21 +468,17 @@ error if the desired ZEO to associate with is not explicitly specified::
     ...
     ... [zeoserver1]
     ... recipe = plone.recipe.zope2zeoserver
-    ... zope2-location = %(zope2_location)s
     ...
     ... [zeoserver2]
     ... recipe = plone.recipe.zope2zeoserver
-    ... zope2-location = %(zope2_location)s
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ...
     ... [secondary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ...
@@ -529,11 +505,9 @@ Specifying a nonexistent ZEO should result in an error::
     ...
     ... [zeoserver]
     ... recipe = plone.recipe.zope2zeoserver
-    ... zope2-location = %(zope2_location)s
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ...
@@ -561,11 +535,9 @@ So should specifying a nonexistent Zope part::
     ...
     ... [zeoserver]
     ... recipe = plone.recipe.zope2zeoserver
-    ... zope2-location = %(zope2_location)s
     ...
     ... [primary]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ... zeo-client = 1
     ...
@@ -594,7 +566,6 @@ included in the buildout::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ...
     ... [filestorage]
@@ -623,7 +594,6 @@ and the ``+=`` or ``-=`` options::
     ...
     ... [instance]
     ... recipe = plone.recipe.zope2instance
-    ... zope2-location = %(zope2_location)s
     ... user = me
     ...
     ... [filestorage]
