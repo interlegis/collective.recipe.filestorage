@@ -5,6 +5,7 @@ Doctest runner for 'collective.recipe.filestorage'.
 __docformat__ = 'restructuredtext'
 
 import os
+import re
 import unittest
 import zc.buildout.tests
 import zc.buildout.testing
@@ -48,12 +49,11 @@ def test_suite():
                 tearDown=zc.buildout.testing.buildoutTearDown,
                 optionflags=optionflags,
                 checker=renormalizing.RENormalizing([
-                        # If want to clean up the doctest output you
-                        # can register additional regexp normalizers
-                        # here. The format is a two-tuple with the RE
-                        # as the first item and the replacement as the
-                        # second item, e.g.
-                        # (re.compile('my-[rR]eg[eE]ps'), 'my-regexps')
+                        # ignore warnings in output
+                        (re.compile('^.*?Warning.*?\n\s*?\n', re.S), ''),
+                        (re.compile('^.*?zip_safe.*?$', re.M), ''),
+                        (re.compile('^.*?module references __path__.*?$', re.M), ''),
+                        (re.compile('^\s*\n', re.S), ''),
                         zc.buildout.testing.normalize_path,
                         ]),
                 globs = globals()
