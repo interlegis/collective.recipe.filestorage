@@ -75,6 +75,173 @@ zeo-shared-blob-dir
     server and client. Defaults to 'on'.
 
 
+Example usage
+=============
+
+Here's a minimal buildout that adds an extra filestorage::
+
+   [buildout]
+   extends = base.cfg
+   parts =
+       filestorage
+       instance
+
+   [instance]
+   recipe = plone.recipe.zope2instance
+   user = me
+
+   [filestorage]
+   recipe = collective.recipe.filestorage
+   parts =
+       mystorage
+
+By default, the location of the new filestorage will be:
+``var/filestorage/mystorage/mystorage.fs``
+
+See above for options to override the defaults.
+
+A setting can be modified just for one particular filestorage, by creating
+a new part with the ``filestorage_`` prefix, like so::
+
+   [filestorage]
+   recipe = collective.recipe.filestorage
+   parts =
+       myfirststorage
+       mysecondstorage
+
+   [filestorage_mysecondstorage]
+   zodb-cache-size = 1000
+
+By default, the recipe adds the extra filestorages to each
+``plone.recipe.zope2instance`` part in the buildout,
+but you can tell it to only add it to certain parts::
+
+    [buildout]
+    extends = base.cfg
+    parts =
+        filestorage
+        instance1
+        instance2
+
+    [instance1]
+    recipe = plone.recipe.zope2instance
+
+    [instance2]
+    recipe = plone.recipe.zope2instance
+
+    [filestorage]
+    recipe = collective.recipe.filestorage
+    zopes = instance1
+    parts =
+        my-fs
+
+Here is a minimal buildout including a ZEO server and two ZODB clients::
+
+    [buildout]
+    extends = base.cfg
+    parts =
+        filestorage
+        zeoserver
+        primary
+        secondary
+
+    [zeoserver]
+    recipe = plone.recipe.zope2zeoserver
+
+    [primary]
+    recipe = plone.recipe.zope2instance
+    zeo-client = on
+
+    [secondary]
+    recipe = plone.recipe.zope2instance
+    zeo-client = on
+
+    [filestorage]
+    recipe = collective.recipe.filestorage
+    parts =
+        my-fs
+
+As above, we can override a number of the default parameters::
+
+    [buildout]
+    extends = base.cfg
+    parts =
+        filestorage
+        zeoserver
+        primary
+        secondary
+
+    [zeoserver]
+    recipe = plone.recipe.zope2zeoserver
+
+    [primary]
+    recipe = plone.recipe.zope2instance
+    zeo-client = on
+
+    [secondary]
+    recipe = plone.recipe.zope2instance
+    zeo-client = on
+
+    [filestorage]
+    recipe = collective.recipe.filestorage
+    location = var/filestorage/%(fs_part_name)s/Data.fs
+    blob-storage = var/blobstorage-%(fs_part_name)s
+    zodb-cache-size = 1000
+    zodb-name = %(fs_part_name)s_db
+    zodb-mountpoint = /%(fs_part_name)s_mountpoint
+    zeo-address = 8101
+    zeo-client-cache-size = 50MB
+    zeo-storage = %(fs_part_name)s_storage
+    zeo-client-name = %(fs_part_name)s_zeostorage_name
+    parts =
+        my-fs
+
+By default, the recipe adds the extra filestorages to the first
+``plone.recipe.zope2zeoserver`` part in the buildout, and will throw an error if
+there is more than one part using this recipe.  However, you can override this
+behavior by specifying a particular ZEO part.  In this case, the filestorages
+will only be added to the Zopes using that ZEO, by default::
+
+    [buildout]
+    extends = base.cfg
+    parts =
+        filestorage
+        zeoserver1
+        zeoserver2
+        primary
+        secondary
+        other-zope
+
+    [zeoserver1]
+    recipe = plone.recipe.zope2zeoserver
+    zeo-address = 8100
+
+    [zeoserver2]
+    recipe = plone.recipe.zope2zeoserver
+    zeo-address = 8101
+
+    [primary]
+    recipe = plone.recipe.zope2instance
+    zeo-client = 1
+    zeo-address = 8101
+
+    [secondary]
+    recipe = plone.recipe.zope2instance
+    zeo-client = 1
+    zeo-address = 8101
+
+    [other-zope]
+    recipe = plone.recipe.zope2instance
+    zeo-client = 1
+    zeo-address = 8100
+
+    [filestorage]
+    recipe = collective.recipe.filestorage
+    zeo = zeoserver2
+    parts =
+        my-fs
+
+
 Running the tests
 =================
 
@@ -100,5 +267,5 @@ Reporting bugs or asking questions
 Use the github tracker:
 https://github.com/collective/collective.recipe.filestorage/issues
 
-Old bugs are at Launchpad:
+Some old bugs are at Launchpad:
 https://bugs.launchpad.net/collective.buildout/
