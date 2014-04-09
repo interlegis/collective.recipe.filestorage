@@ -60,7 +60,7 @@ setup(name='collective.recipe.filestorage',
                         # -*- Extra requirements: -*-
                         ],
       tests_require=tests_require,
-      extras_require=dict(tests=tests_require),
+      extras_require=dict(test=tests_require),
       test_suite = 'collective.recipe.filestorage.tests.test_docs.test_suite',
       entry_points=entry_points,
       )
