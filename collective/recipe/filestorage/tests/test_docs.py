@@ -50,7 +50,7 @@ def test_suite():
                 optionflags=optionflags,
                 checker=renormalizing.RENormalizing([
                         # ignore warnings in output
-                        (re.compile('^.*?Warning.*?\n\s*?\n', re.S), ''),
+                        (re.compile('^.*?Warning.*?\n\s*?\n', re.I | re.S), ''),
                         (re.compile('^.*?zip_safe.*?$', re.M), ''),
                         (re.compile('^.*?module references __path__.*?$', re.M), ''),
                         (re.compile('^\s*\n', re.S), ''),

@@ -1,1 +1,1 @@
-Code repository: http://svn.plone.org/collective/buildout/collective.recipe.filestorage/trunk
+see collective/recipe/filestorage/README.txt
