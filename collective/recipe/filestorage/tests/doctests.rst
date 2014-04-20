@@ -22,7 +22,7 @@ Let's create and run a minimal buildout that adds an extra filestorage::
    ... ''' % globals())
    >>> print system(join('bin', 'buildout') + ' -q')
 
-Our zope.conf should get the extra filestorage stanza automatically injected into it::
+Our ``zope.conf`` should get the extra filestorage stanza automatically injected into it::
 
    >>> instance = os.path.join(sample_buildout, 'parts', 'instance')
    >>> print open(os.path.join(instance, 'etc', 'zope.conf')).read()
