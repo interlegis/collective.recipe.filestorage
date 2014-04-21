@@ -34,6 +34,9 @@ in a new buildout part called ``filestorage_subpart``, where *subpart* is the na
 of the subpart listed in the ``parts`` option of this recipe.  The name of the
 subpart may be interpolated by using ``%(fs_part_name)s`` in the option.
 
+allow-implicit-cross-references
+    Allow references across mounted databases. This is generally a bad idea.
+    Defaults to ``False``.
 location
     The location of the ``Data.fs`` file, relative to the buildout root directory.
     Defaults to ``var/filestorage/%(fs_part_name)s/Data.fs``

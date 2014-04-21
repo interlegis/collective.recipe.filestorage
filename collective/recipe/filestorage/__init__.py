@@ -169,6 +169,7 @@ class Recipe(object):
                 )
         
         zodb_cache_size = self._subpart_option(subpart, 'zodb-cache-size', default='5000', inherit=zope_part)
+        allow_implicit_cross_references = self._subpart_option(subpart, 'allow-implicit-cross-references', default='false')
         zodb_name = self._subpart_option(subpart, 'zodb-name', default='%(fs_part_name)s')
         zodb_mountpoint = self._subpart_option(subpart, 'zodb-mountpoint', default='/%(fs_part_name)s')
         zodb_container_class = self._subpart_option(subpart, 'zodb-container-class', default='')
@@ -176,6 +177,7 @@ class Recipe(object):
             zodb_container_class = "\n    container-class %s" % zodb_container_class
         zodb_stanza = zodb_template % dict(
             zodb_name = zodb_name,
+            allow_implicit_cross_references = allow_implicit_cross_references,
             zodb_mountpoint = zodb_mountpoint,
             zodb_container_class = zodb_container_class,
             zodb_cache_size = zodb_cache_size,
@@ -311,6 +313,7 @@ zeo_blob_storage_template="""
 zodb_template="""
 <zodb_db %(zodb_name)s>
     cache-size %(zodb_cache_size)s
+    allow-implicit-cross-references %(allow_implicit_cross_references)s
     %(storage_snippet)s
     mount-point %(zodb_mountpoint)s%(zodb_container_class)s
 </zodb_db>
