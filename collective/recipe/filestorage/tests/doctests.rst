@@ -331,9 +331,9 @@ As above, we can override a number of the default parameters::
     Created directory .../parts/zeoserver/bin
     Wrote file .../parts/zeoserver/etc/zeo.conf
     Wrote file .../parts/zeoserver/bin/zeoctl
-    Changed mode for .../parts/zeoserver/bin/zeoctl to 775
+    Changed mode for .../parts/zeoserver/bin/zeoctl to ...
     Wrote file .../parts/zeoserver/bin/runzeo
-    Changed mode for .../parts/zeoserver/bin/runzeo to 775
+    Changed mode for .../parts/zeoserver/bin/runzeo to ...
     <BLANKLINE>
     >>> zeoserver = os.path.join(sample_buildout, 'parts', 'zeoserver')
     >>> print open(os.path.join(zeoserver, 'etc', 'zeo.conf')).read()
@@ -449,9 +449,9 @@ will only be added to the Zopes using that ZEO, by default::
     Created directory .../parts/zeoserver2/bin
     Wrote file .../parts/zeoserver2/etc/zeo.conf
     Wrote file .../parts/zeoserver2/bin/zeoctl
-    Changed mode for .../parts/zeoserver2/bin/zeoctl to 775
+    Changed mode for .../parts/zeoserver2/bin/zeoctl to ...
     Wrote file .../parts/zeoserver2/bin/runzeo
-    Changed mode for .../parts/zeoserver2/bin/runzeo to 775
+    Changed mode for .../parts/zeoserver2/bin/runzeo to ...
     Created directory .../parts/zeoserver1
     Created directory .../parts/zeoserver1/etc
     Created directory .../parts/zeoserver1/var
@@ -459,9 +459,9 @@ will only be added to the Zopes using that ZEO, by default::
     Created directory .../parts/zeoserver1/bin
     Wrote file .../parts/zeoserver1/etc/zeo.conf
     Wrote file .../parts/zeoserver1/bin/zeoctl
-    Changed mode for .../parts/zeoserver1/bin/zeoctl to 775
+    Changed mode for .../parts/zeoserver1/bin/zeoctl to ...
     Wrote file .../parts/zeoserver1/bin/runzeo
-    Changed mode for .../parts/zeoserver1/bin/runzeo to 775
+    Changed mode for .../parts/zeoserver1/bin/runzeo to ...
     <BLANKLINE>
     >>> 'my-fs' in open('parts/zeoserver2/etc/zeo.conf').read()
     True
