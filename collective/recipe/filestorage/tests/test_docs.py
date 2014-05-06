@@ -33,18 +33,18 @@ def setUp(test):
     # Add a base.cfg we can extend
     zc.buildout.testing.write('base.cfg', '''
 [buildout]
+extends = http://dist.plone.org/release/4.3/versions.cfg
 index = http://pypi.python.org/simple
-versions = versions
 [versions]
 # pin to a version that doesn't pull in an eggified Zope
-plone.recipe.zope2instance = 3.6
+# plone.recipe.zope2instance = 3.6
 ''')
 
 
 def test_suite():
     suite = unittest.TestSuite((
             doctest.DocFileSuite(
-                '../README.txt',
+                'doctests.rst',
                 setUp=setUp,
                 tearDown=zc.buildout.testing.buildoutTearDown,
                 optionflags=optionflags,

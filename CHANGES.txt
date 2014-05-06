@@ -3,6 +3,9 @@
 
  - Add support for c.r.backup
    [mamico]
+ - Document virtual mount points. [jean]
+ - Disallow cross-database references finally (see https://dev.plone.org/ticket/11150)
+   [jean]
 
 0.6 (2010-08-13)
 ================
