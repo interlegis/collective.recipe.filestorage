@@ -5,13 +5,14 @@ import os
 
 from zc.buildout import UserError
 
+
 class Recipe(object):
     """zc.buildout recipe"""
 
     def __init__(self, buildout, name, options):
         self.buildout, self.name, self.options = buildout, name, options
         active_parts = [p.strip() for p in self.buildout['buildout']['parts'].split()]
-        
+
         # figure out which ZEO we're going to inject filestorage configuration into, if any
         zeo_address = None
         self.zeo_part = options.get('zeo', None)
@@ -42,16 +43,26 @@ class Recipe(object):
                     if zeo_address is None or zeo_address == part.get('zeo-address', 8100):
                         self.zope_parts.append(part_name)
                 
-        # make sure this part is before any associated zeo/zope parts in the buildout parts list
+        # figure out c.r.backup recipe
+        self.backup_part = options.get('backup', None)
+        if self.backup_part is not None:
+            if not self.backup_part in self.buildout:
+                raise UserError, '[collective.recipe.filestorage] "%s" part specifies nonexistant backup part "%s".' % (name, self.backup_part)
+
+        # make sure this part is before any associated zeo/zope parts in the
+        # buildout parts list
         self._validate_part_order()
         
-        # inject the extra sections into the correct zope-conf-additional or zeo-conf-additional variables.
+        # inject the extra sections into the correct zope-conf-additional or
+        # zeo-conf-additional variables.
         self.subparts = options.get('parts', '').split()
         for subpart in self.subparts:
             for zope_part in self.zope_parts:
                 self._inject_zope_conf(zope_part, subpart)
             if self.zeo_part is not None:
                 self._inject_zeo_conf(self.zeo_part, subpart)
+            if self.backup_part is not None:
+                self._inject_backup_additional(self.backup_part, subpart)
 
     def install(self):
         
@@ -87,13 +98,15 @@ class Recipe(object):
         pass
         
     def _validate_part_order(self):
-        """ Make sure this part is before any associated zeo/zope parts in the buildout parts list.
+        """ Make sure this part is before any associated zeo/zope parts in the
+            buildout parts list.
         """
-        
         injector_parts = [self.name]
         target_parts = self.zope_parts[:]
         if self.zeo_part is not None:
             target_parts.append(self.zeo_part)
+        if self.backup_part is not None:
+            target_parts.append(self.backup_part)
         for part_name in self.buildout['buildout']['parts'].split():
             if part_name in injector_parts:
                 injector_parts.remove(part_name)
@@ -186,6 +199,7 @@ class Recipe(object):
                 )
         
         zodb_cache_size = self._subpart_option(subpart, 'zodb-cache-size', default='5000', inherit=zope_part)
+        allow_implicit_cross_references = self._subpart_option(subpart, 'allow-implicit-cross-references', default='false')
         zodb_name = self._subpart_option(subpart, 'zodb-name', default='%(fs_part_name)s')
         zodb_mountpoint = self._subpart_option(subpart, 'zodb-mountpoint', default='/%(fs_part_name)s')
         zodb_container_class = self._subpart_option(subpart, 'zodb-container-class', default='')
@@ -193,6 +207,7 @@ class Recipe(object):
             zodb_container_class = "\n    container-class %s" % zodb_container_class
         zodb_stanza = zodb_template % dict(
             zodb_name = zodb_name,
+            allow_implicit_cross_references = allow_implicit_cross_references,
             zodb_mountpoint = zodb_mountpoint,
             zodb_container_class = zodb_container_class,
             zodb_cache_size = zodb_cache_size,
@@ -238,6 +253,29 @@ class Recipe(object):
         zeo_conf_additional = zeo_options.get('zeo-conf-additional', '')
         zeo_options['zeo-conf-additional'] = zeo_conf_additional + storage_snippet
     
+    def _inject_backup_additional(self, backup_part, subpart):
+        backup_options = self.buildout[backup_part]
+
+        location = self._subpart_option(subpart, 'location', default=os.path.join('var', 'filestorage', '%(fs_part_name)s', '%(fs_part_name)s.fs'))
+        location = os.path.join(self.buildout['buildout']['directory'], location)
+        zeo_storage = self._subpart_option(subpart, 'zeo-storage', default='%(fs_part_name)s')
+        backup_template = "%(fs_name)s %(fs_path)s"
+        blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
+        if self._subpart_option(subpart, 'blob-storage', default=''):
+            blob_storage = self._subpart_option(subpart, 'blob-storage', default=blob_storage)
+            if not blob_storage.startswith(os.path.sep):
+                blob_storage = os.path.join(self.buildout['buildout']['directory'], blob_storage)
+            backup_template = "%(fs_name)s %(fs_path)s %(blob_storage)s"
+
+        additional = backup_template % dict(
+            fs_name=zeo_storage,
+            fs_path=location,
+            blob_storage=blob_storage,
+            )
+
+        backup_additionals = backup_options.get('additional_filestorages', '')
+        backup_options['additional_filestorages'] = '\n'.join([backup_additionals, additional])
+
     def _subpart_option(self, subpart, option, default=None, inherit=()):
         """ Retrieve an option for a filestorage subpart, perhaps falling back to other specified parts.
             Also substitutes the name of the subpart. 
@@ -358,6 +396,7 @@ zeo_blob_storage_template="""
 zodb_template="""
 <zodb_db %(zodb_name)s>
     cache-size %(zodb_cache_size)s
+    allow-implicit-cross-references %(allow_implicit_cross_references)s
     %(storage_snippet)s
     mount-point %(zodb_mountpoint)s%(zodb_container_class)s
 </zodb_db>

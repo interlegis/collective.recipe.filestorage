@@ -5,6 +5,7 @@ Doctest runner for 'collective.recipe.filestorage'.
 __docformat__ = 'restructuredtext'
 
 import os
+import re
 import unittest
 import zc.buildout.tests
 import zc.buildout.testing
@@ -32,28 +33,27 @@ def setUp(test):
     # Add a base.cfg we can extend
     zc.buildout.testing.write('base.cfg', '''
 [buildout]
+extends = http://dist.plone.org/release/4.3/versions.cfg
 index = http://pypi.python.org/simple
-versions = versions
 [versions]
 # pin to a version that doesn't pull in an eggified Zope
-plone.recipe.zope2instance = 3.6
+# plone.recipe.zope2instance = 3.6
 ''')
 
 
 def test_suite():
     suite = unittest.TestSuite((
             doctest.DocFileSuite(
-                '../README.txt',
+                'doctests.rst',
                 setUp=setUp,
                 tearDown=zc.buildout.testing.buildoutTearDown,
                 optionflags=optionflags,
                 checker=renormalizing.RENormalizing([
-                        # If want to clean up the doctest output you
-                        # can register additional regexp normalizers
-                        # here. The format is a two-tuple with the RE
-                        # as the first item and the replacement as the
-                        # second item, e.g.
-                        # (re.compile('my-[rR]eg[eE]ps'), 'my-regexps')
+                        # ignore warnings in output
+                        (re.compile('^.*?Warning.*?\n\s*?\n', re.I | re.S), ''),
+                        (re.compile('^.*?zip_safe.*?$', re.M), ''),
+                        (re.compile('^.*?module references __path__.*?$', re.M), ''),
+                        (re.compile('^\s*\n', re.S), ''),
                         zc.buildout.testing.normalize_path,
                         ]),
                 globs = globals()
