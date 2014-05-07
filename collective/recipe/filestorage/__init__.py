@@ -52,7 +52,7 @@ class Recipe(object):
         # make sure this part is before any associated zeo/zope parts in the
         # buildout parts list
         self._validate_part_order()
-        
+
         # inject the extra sections into the correct zope-conf-additional or
         # zeo-conf-additional variables.
         self.subparts = options.get('parts', '').split()
@@ -132,12 +132,15 @@ class Recipe(object):
         keep_alive_delay = ''
         if self.zeo_part and self.zeo_part in self.buildout:
             replicate_from = self.buildout[self.zeo_part].get('replicate-from', '')
+            replicate_from = self._subpart_option(subpart, 'replicate-from', default=replicate_from)
             if replicate_from:
                 replicate_from = 'replicate-from ' + replicate_from
             replicate_to = self.buildout[self.zeo_part].get('replicate-to', '')
+            replicate_to = self._subpart_option(subpart, 'replicate-to', default=replicate_to)
             if replicate_to:
                 replicate_to = 'replicate-to ' + replicate_to
             keep_alive_delay = self.buildout[self.zeo_part].get('keep-alive-delay', '')
+            keep_alive_delay = self._subpart_option(subpart, 'keep-alive-delay', default=keep_alive_delay)
             if keep_alive_delay:
                 keep_alive_delay = 'keep-alive-delay ' + keep_alive_delay
         if self._subpart_option(subpart, 'blob-storage', default=''):
@@ -227,12 +230,15 @@ class Recipe(object):
         storage_template = file_storage_template
         blob_storage = os.path.join('var', 'blobstorage-%(fs_part_name)s')
         replicate_from = zeo_options.get('replicate-from', '')
+        replicate_from = self._subpart_option(subpart, 'replicate-from', default=replicate_from)
         if replicate_from:
             replicate_from = 'replicate-from ' + replicate_from
         replicate_to = zeo_options.get('replicate-to', '')
+        replicate_to = self._subpart_option(subpart, 'replicate-to', default=replicate_to)
         if replicate_to:
             replicate_to = 'replicate-to ' + replicate_to
         keep_alive_delay = zeo_options.get('keep-alive-delay', '')
+        keep_alive_delay = self._subpart_option(subpart, 'keep-alive-delay', default=keep_alive_delay)
         if keep_alive_delay:
             keep_alive_delay = 'keep-alive-delay ' + keep_alive_delay
         if self._subpart_option(subpart, 'blob-storage', default=''):
